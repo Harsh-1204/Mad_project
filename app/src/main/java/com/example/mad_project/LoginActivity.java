@@ -13,6 +13,7 @@ import android.widget.Toast;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
     private TextInputLayout emailLayout;
@@ -25,10 +26,21 @@ public class LoginActivity extends AppCompatActivity {
     private TextView forgotPasswordText;
     private boolean passwordVisible = false;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        // If user is already logged in, go to Dashboard
+        if (mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+            finish();
+        }
 
         // Initialize views
         emailLayout = findViewById(R.id.emailLayout);
@@ -56,17 +68,25 @@ public class LoginActivity extends AppCompatActivity {
         // Sign In button click
         signInButton.setOnClickListener(v -> {
             if (validateInputs()) {
-                // Any valid email and password format will work
-                Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
-                finish(); // Close login activity
+                String email = emailEditText.getText().toString().trim();
+                String password = passwordEditText.getText().toString().trim();
+
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                                finish(); // Close login activity
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
             }
         });
 
         // Sign Up text click
         signUpText.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-            // Don't finish this activity so user can come back
         });
 
         // Forgot Password text click
@@ -104,4 +124,4 @@ public class LoginActivity extends AppCompatActivity {
 
         return isValid;
     }
-} 
+}

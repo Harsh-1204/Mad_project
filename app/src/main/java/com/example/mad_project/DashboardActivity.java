@@ -2,15 +2,21 @@ package com.example.mad_project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +48,34 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(new Intent(this, WatchlistActivity.class));
         });
 
+        // Profile menu (including logout)
+        ImageView profileImage = findViewById(R.id.profileImage);
+        profileImage.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(DashboardActivity.this, view);
+            popupMenu.getMenuInflater().inflate(R.menu.profile_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.menu_logout) {
+                    // ✅ Proper logout from Firebase
+                    FirebaseAuth.getInstance().signOut();
+
+                    Toast.makeText(DashboardActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
+
+                    // Redirect to Login and clear backstack
+                    Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            });
+            popupMenu.show();
+        });
+
         // Setup bottom navigation
         setupBottomNavigation();
     }
 
     private void setupChart() {
-        // Sample data
         List<Entry> entries = new ArrayList<>();
         entries.add(new Entry(0, 180000));
         entries.add(new Entry(1, 185000));
@@ -81,14 +109,13 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void setupTimeFilters() {
         timeFilterGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            // Handle time filter changes
             // TODO: Update chart data based on selected time period
         });
     }
 
     private void setupBottomNavigation() {
-        bottomNavigation.setSelectedItemId(R.id.navigation_home); // Set Home as selected
-        
+        bottomNavigation.setSelectedItemId(R.id.navigation_home);
+
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_home) {
@@ -100,10 +127,9 @@ public class DashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, PortfolioActivity.class));
                 return true;
             } else if (itemId == R.id.navigation_news) {
-                // TODO: Navigate to News
                 return true;
             }
             return false;
         });
     }
-} 
+}
