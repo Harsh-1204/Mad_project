@@ -26,7 +26,10 @@
             android:name=".OnboardingActivity"
             android:exported="false"
             android:theme="@style/Theme.StockMarket"/>
-
+        <activity
+            android:name=".MainActivityChatBot"
+            android:exported="false"
+            android:theme="@style/Theme.StockMarket"/>
         <activity
             android:name=".LoginActivity"
             android:exported="false"

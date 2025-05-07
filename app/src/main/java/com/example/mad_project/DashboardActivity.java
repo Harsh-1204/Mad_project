@@ -15,6 +15,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class DashboardActivity extends AppCompatActivity {
     private ChipGroup timeFilterGroup;
     private MaterialButton watchlistButton;
     private BottomNavigationView bottomNavigation;
+    private FloatingActionButton chatFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +38,18 @@ public class DashboardActivity extends AppCompatActivity {
         timeFilterGroup = findViewById(R.id.timeFilterGroup);
         watchlistButton = findViewById(R.id.watchlistButton);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        chatFab = findViewById(R.id.chatFab);
 
         // Setup chart
         setupChart();
 
         // Setup time filter chips
         setupTimeFilters();
+
+        // Set up ChatBot FAB
+        chatFab.setOnClickListener(v -> {
+            startActivity(new Intent(this, MainActivityChatBot.class));
+        });
 
         // Handle watchlist button click
         watchlistButton.setOnClickListener(v -> {
